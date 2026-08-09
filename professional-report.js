@@ -3550,11 +3550,268 @@ function addManagementRecommendations(pdf,data){
 }
 
 
+// ============================================================
+// MANAGEMENT SIGN-OFF PAGE
+// GDI INTEGRATED FACILITY SERVICES
+// ============================================================
 
+function addManagementSignOff(pdf, data, filters = {}){
 
+    pdf.addPage();
 
+    addHeader(pdf);
 
+    const kpi = calculateKPIs(data);
 
+    // ========================================================
+    // TITLE
+    // ========================================================
+
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(18);
+
+    pdf.text(
+        "Management Review & Sign-Off",
+        15,
+        45
+    );
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(10);
+
+    pdf.text(
+        "Executive Cleaning Compliance Report",
+        15,
+        53
+    );
+
+    // ========================================================
+    // REPORT INFORMATION
+    // ========================================================
+
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(11);
+
+    pdf.text(
+        "Report Information",
+        15,
+        70
+    );
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(10);
+
+    pdf.text(
+        `Company: ${REPORT.company}`,
+        20,
+        80
+    );
+
+    pdf.text(
+        `Facility: ${REPORT.facility}`,
+        20,
+        88
+    );
+
+    pdf.text(
+        `Report Period: ${getReportingPeriod(data)}`,
+        20,
+        96
+    );
+
+    pdf.text(
+        `Surveys Reviewed: ${kpi.totalSurveys}`,
+        20,
+        104
+    );
+
+    pdf.text(
+        `Overall Compliance: ${kpi.compliance}%`,
+        20,
+        112
+    );
+
+    pdf.text(
+        `Performance Status: ${kpi.status}`,
+        20,
+        120
+    );
+
+    // ========================================================
+    // MANAGEMENT REVIEW STATEMENT
+    // ========================================================
+
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(11);
+
+    pdf.text(
+        "Management Review",
+        15,
+        140
+    );
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(10);
+
+    const reviewText =
+        "This report has been reviewed for cleaning compliance, " +
+        "operational performance, identified risks, and documented " +
+        "survey activity for the reporting period.";
+
+    const reviewLines =
+        pdf.splitTextToSize(
+            reviewText,
+            170
+        );
+
+    pdf.text(
+        reviewLines,
+        20,
+        150
+    );
+
+    // ========================================================
+    // REVIEW COMMENTS
+    // ========================================================
+
+    pdf.setFont("helvetica","bold");
+
+    pdf.text(
+        "Management Comments",
+        15,
+        175
+    );
+
+    pdf.setFont("helvetica","normal");
+
+    pdf.roundedRect(
+        15,
+        182,
+        180,
+        42,
+        2,
+        2
+    );
+
+    // ========================================================
+    // SIGN-OFF SECTION
+    // ========================================================
+
+    pdf.setFont("helvetica","bold");
+
+    pdf.text(
+        "Report Approval / Sign-Off",
+        15,
+        242
+    );
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(10);
+
+    pdf.text(
+        "Prepared By:",
+        20,
+        255
+    );
+
+    pdf.line(
+        55,
+        256,
+        105,
+        256
+    );
+
+    pdf.text(
+        "Reviewed By:",
+        110,
+        255
+    );
+
+    pdf.line(
+        145,
+        256,
+        195,
+        256
+    );
+
+    pdf.text(
+        "Signature:",
+        20,
+        270
+    );
+
+    pdf.line(
+        55,
+        271,
+        105,
+        271
+    );
+
+    pdf.text(
+        "Date:",
+        110,
+        270
+    );
+
+    pdf.line(
+        130,
+        271,
+        195,
+        271
+    );
+
+    // ========================================================
+    // APPROVAL STATUS
+    // ========================================================
+
+    pdf.text(
+        "Management Approval:",
+        20,
+        285
+    );
+
+    pdf.rect(
+        75,
+        278,
+        5,
+        5
+    );
+
+    pdf.text(
+        "Approved",
+        83,
+        283
+    );
+
+    pdf.rect(
+        120,
+        278,
+        5,
+        5
+    );
+
+    pdf.text(
+        "Approved with Comments",
+        128,
+        283
+    );
+
+    pdf.rect(
+        180,
+        278,
+        5,
+        5
+    );
+
+    pdf.text(
+        "Review Required",
+        188,
+        283
+    );
+
+    addFooter(pdf);
+
+}
 
 
 // ============================================================
@@ -3703,6 +3960,7 @@ addSurveyRecords(pdf, reportData);
 
 addManagementRecommendations(pdf, reportData);
 
+addManagementSignOff(pdf, reportData, filters);
 
         pdf.save(
 
