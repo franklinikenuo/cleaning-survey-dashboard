@@ -3760,56 +3760,78 @@ function addManagementSignOff(pdf, data, filters = {}){
         271
     );
 
-    // ========================================================
-    // APPROVAL STATUS
-    // ========================================================
+// ========================================================
+// APPROVAL STATUS
+// ========================================================
 
-    pdf.text(
-        "Management Approval:",
-        20,
-        285
-    );
+pdf.setFont(
+    "helvetica",
+    "bold"
+);
 
-    pdf.rect(
-        75,
-        278,
-        5,
-        5
-    );
+pdf.setFontSize(10);
 
-    pdf.text(
-        "Approved",
-        83,
-        283
-    );
+pdf.text(
+    "Management Approval:",
+    20,
+    278
+);
 
-    pdf.rect(
-        120,
-        278,
-        5,
-        5
-    );
+pdf.setFont(
+    "helvetica",
+    "normal"
+);
 
-    pdf.text(
-        "Approved with Comments",
-        128,
-        283
-    );
 
-    pdf.rect(
-        180,
-        278,
-        5,
-        5
-    );
+// Approved
 
-    pdf.text(
-        "Review Required",
-        188,
-        283
-    );
+pdf.rect(
+    72,
+    271,
+    5,
+    5
+);
 
-    addFooter(pdf);
+pdf.text(
+    "Approved",
+    80,
+    276
+);
+
+
+// Approved with Comments
+
+pdf.rect(
+    112,
+    271,
+    5,
+    5
+);
+
+pdf.text(
+    "Approved with Comments",
+    120,
+    276
+);
+
+
+// Review Required
+
+pdf.rect(
+    165,
+    271,
+    5,
+    5
+);
+
+pdf.text(
+    "Review Required",
+    173,
+    276
+);
+
+
+addFooter(pdf);
 
 }
 
