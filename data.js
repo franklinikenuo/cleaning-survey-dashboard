@@ -1,6 +1,13 @@
 // ============================================================
-// DATA STORE
+// UCDS DATA STORE v3.3
 // Single Source Of Truth For Survey Data
+//
+// FIX:
+// - Supabase default 1,000-row response limit handled
+// - Automatically loads ALL survey records in batches
+// - Compatible with dashboard-core.js
+// - Compatible with analytics / charts / reports / exports
+// - Maintains existing DataStore API
 // ============================================================
 
 
@@ -12,8 +19,17 @@ window.DataStore = {
     loading: false,
 
 
+
     // ========================================================
-    // LOAD SURVEYS FROM SUPABASE
+    // CONFIGURATION
+    // ========================================================
+
+    PAGE_SIZE: 1000,
+
+
+
+    // ========================================================
+    // LOAD ALL SURVEYS FROM SUPABASE
     // ========================================================
 
     async load(){
@@ -36,54 +52,159 @@ window.DataStore = {
         try{
 
 
-            const {
-                data,
-                error
-
-            } = await client
-
-            .from("surveys")
-
-            .select("*")
-
-            .order(
-                "created_at",
-                {
-                    ascending:false
-                }
+            console.log(
+                "Loading surveys from Supabase..."
             );
 
 
+            let allSurveys = [];
 
-            if(error){
+            let from = 0;
+
+            let hasMore = true;
 
 
-                console.error(
-                    "Supabase fetch error:",
-                    error
+
+            // =================================================
+            // PAGINATION LOOP
+            // =================================================
+
+            while(hasMore){
+
+
+                const to =
+                    from + this.PAGE_SIZE - 1;
+
+
+
+                console.log(
+                    `Loading surveys ${from + 1}-${to + 1}...`
                 );
 
 
-                return this.surveys;
+
+                const {
+                    data,
+                    error
+                } = await client
+
+                    .from("surveys")
+
+                    .select("*")
+
+                    .order(
+                        "created_at",
+                        {
+                            ascending:false
+                        }
+                    )
+
+                    .range(
+                        from,
+                        to
+                    );
+
+
+
+                // =============================================
+                // SUPABASE ERROR
+                // =============================================
+
+                if(error){
+
+
+                    console.error(
+                        "Supabase fetch error:",
+                        error
+                    );
+
+
+                    // Keep previously loaded data
+                    // if a later page fails.
+
+                    if(allSurveys.length){
+
+                        this.surveys =
+                            allSurveys;
+
+                    }
+
+
+                    return this.surveys;
+
+                }
+
+
+
+                // =============================================
+                // ADD CURRENT PAGE
+                // =============================================
+
+                if(
+                    Array.isArray(data) &&
+                    data.length
+                ){
+
+                    allSurveys.push(
+                        ...data
+                    );
+
+
+                    console.log(
+                        `Loaded page: ${data.length} surveys`
+                    );
+
+
+                }
+
+
+
+                // =============================================
+                // DETERMINE WHETHER MORE DATA EXISTS
+                // =============================================
+
+                if(
+                    !data ||
+                    data.length < this.PAGE_SIZE
+                ){
+
+                    hasMore = false;
+
+                }
+                else{
+
+                    from +=
+                        this.PAGE_SIZE;
+
+                }
 
 
             }
 
 
 
+            // =================================================
+            // STORE COMPLETE DATASET
+            // =================================================
+
             this.surveys =
-                data || [];
+                allSurveys;
 
 
 
             console.log(
+                "=========================================="
+            );
 
-                "Loaded",
 
-                this.surveys.length,
+            console.log(
+                "✅ ALL SURVEYS LOADED:",
+                this.surveys.length
+            );
 
-                "surveys"
 
+            console.log(
+                "=========================================="
             );
 
 
@@ -91,8 +212,8 @@ window.DataStore = {
             return this.surveys;
 
 
-
         }
+
 
         catch(error){
 
@@ -112,7 +233,8 @@ window.DataStore = {
         finally{
 
 
-            this.loading = false;
+            this.loading =
+                false;
 
 
         }
@@ -197,5 +319,5 @@ window.DataStore = {
 
 
 console.log(
-    "✅ DataStore initialized"
+    "✅ DataStore v3.3 initialized"
 );
